@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -15,13 +16,23 @@ function MovieList(){
             })
         })
     }
-    // useEffect(()=>{
-    //     getTrendingMovies();
-    // })
+    useEffect(()=>{
+        getTrendingMovies();
+    }, []);
+    const addToFav = (item) =>{
+        const serverURL = `http://localhost:3004/addToFav`;
+        axios.post(serverURL, item)
+        .then(response => {
+            console.log(response.data)
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
     return(
         <>
         <Movie />
-        <button onClick={getTrendingMovies}>get movies</button>
+        {/* <button onClick={getTrendingMovies}>get movies</button> */}
         {movieArray.map(item=>{
             return(
                 <Card style={{ width: '18rem' }}>
@@ -34,7 +45,7 @@ function MovieList(){
                   <Card.Text>
                     {item.release_date}
                   </Card.Text>
-                  {/* <Button variant="primary">Go somewhere</Button> */}
+                  <Button variant="primary" onClick={()=>{addToFav(item)}}>Add to Favorite</Button>
                 </Card.Body>
               </Card>
             )
