@@ -20,5 +20,4 @@ function ModalMovie({ movie, addToFav }){
     </>
   );
 }
-
 export default ModalMovie;
