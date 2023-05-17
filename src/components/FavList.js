@@ -4,9 +4,9 @@ import Card from 'react-bootstrap/Card';
 
 
 function FavList(){
-    const [favArr,setFavArr] = useState([])
+    const [movies, setFavArr] = useState([])
     const getFavMovies = () =>{
-        const serverURL = `http://localhost:3004/addToFav`;
+        const serverURL = `${process.env.REACT_APP_serverURL}/addToFav`;
         fetch(serverURL)
         // .then((response)=>{
         //     response.json()
@@ -17,7 +17,7 @@ function FavList(){
         // })
         axios.get(serverURL)
         .then(response => {
-            setMovies(response.data);
+            setFavArr(response.data);
           })
           .catch(error => {
             console.log(error);
