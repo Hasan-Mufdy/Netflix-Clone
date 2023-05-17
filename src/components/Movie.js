@@ -9,7 +9,7 @@ import ModalMovie from './ModalMovie';
 function Movie(){
     const [movieArray, setMovieArray] = useState([])
     const getTrendingMovies = () =>{
-        const serverURL = `http://localhost:3004/trending`;
+        const serverURL = `${process.env.REACT_APP_serverURL}/trending`;
         fetch(serverURL)
         .then(response =>{
             response.json().then(data =>{
@@ -22,7 +22,7 @@ function Movie(){
         getTrendingMovies();
     }, []);
     // const addToFav = (item) =>{
-    //     const serverURL = `http://localhost:3004/addToFav`;
+    //     const serverURL = `${process.env.REACT_APP_serverURL}/addToFav`;
     //     axios.post(serverURL, item)
     //     .then(response => {
     //         console.log(response.data)
@@ -32,7 +32,7 @@ function Movie(){
     //     })
     // }
     const addToFav = (item) => {  // to save the movie data to favorites // (with the comment)
-        const serverURL = `http://localhost:3004/addToFav`;
+        const serverURL = `${process.env.REACT_APP_serverURL}/addToFav`;
         const data = {
           name: item.title,
           poster_path: item.poster_path,
