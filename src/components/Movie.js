@@ -1,79 +1,123 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import ModalMovie from './ModalMovie';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Modal from "react-bootstrap/Modal";
+import ModalMovie from "./ModalMovie";
 
+function Movie(props) {
+  ///////
 
+  /////////////////////////////////////////////////////
 
-function Movie(){
-    const [movieArray, setMovieArray] = useState([])
-    const getTrendingMovies = () =>{
-        const serverURL = `${process.env.REACT_APP_serverURL}/trending`;
-        fetch(serverURL)
-        .then(response =>{
-            response.json().then(data =>{
-                console.log(data);
-                setMovieArray(data)
-            })
-        })
+  const [showFlag, setShowFlag] = useState(false);
+  const [clickedMovie, setClickedMovie] = useState({});
+  const [newArr, setNewArr] = useState([]);
+  const [showUpdateModalFlag, setShowUpdateModalFlag] = useState(false);
+
+  const handleShow = (item) => {
+    setShowFlag(true);
+    setClickedMovie(item);
+  };
+
+  const handleClose = () => {
+    setShowFlag(false);
+  };
+
+  const showUpdateModal = (item) => {
+    setClickedMovie(item);
+    setShowUpdateModalFlag(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setShowUpdateModalFlag(false);
+  };
+
+  const takeNewDataFromUpdatedModal = (arr) => {
+    setNewArr(arr);
+    console.log(newArr);
+  };
+
+  useEffect(() => {
+    setNewArr(props.movies);
+  }, [props.movies]);
+
+  const updateComment = async (e) => {
+    e.preventDefault();
+    const updatedMovie = {
+      ...clickedMovie,
+      comment: e.target.comment.value,
+    };
+
+    const serverURL = `${process.env.REACT_APP_serverURL}/updateComment/${clickedMovie.id}`;
+    try {
+      const response = await axios.put(serverURL, updatedMovie);
+      console.log("Updated movie:", response.data);
+      handleCloseUpdateModal();
+      takeNewDataFromUpdatedModal(response.data);
+    } catch (error) {
+      console.error("Error updating movie:", error);
     }
-    useEffect(()=>{
-        getTrendingMovies();
-    }, []);
-    // const addToFav = (item) =>{
-    //     const serverURL = `${process.env.REACT_APP_serverURL}/addToFav`;
-    //     axios.post(serverURL, item)
-    //     .then(response => {
-    //         console.log(response.data)
-    //     })
-    //     .catch((error) => {
-    //         console.log(error)
-    //     })
-    // }
-    const addToFav = (item) => {  // to save the movie data to favorites // (with the comment)
-        const serverURL = `${process.env.REACT_APP_serverURL}/addToFav`;
-        const data = {
-          name: item.title,
-          poster_path: item.poster_path,
-          overview: item.overview,
-          comment: '' // will be empty at first
-        };
-        axios.post(serverURL, data)
-          .then(response => {
-            console.log(response.data);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    ////////////////////
-    return(
-        <>
-        
-        {/* <button onClick={getTrendingMovies}>get movies</button> */}
-        {movieArray.map(item=>{
-            return(
-                <Card style={{ width: '18rem' }}>
-                {/* <Card.Img variant="top" src={item.poster_path} /> */}
-                <Card.Body>
-                  <Card.Title>{item.title}</Card.Title>
-                  <Card.Text>
-                    {item.overview}
-                  </Card.Text>
-                  <Card.Text>
-                    {item.release_date}
-                  </Card.Text>
-                  {/* <Button variant="primary" onClick={()=>{addToFav(item)}}>Add to Favorite</Button> */}
-                </Card.Body>
-                <ModalMovie movie={item} addToFav={addToFav} />
-              </Card>
-            )
-        })}
+  };
 
-        
-        </>
-    )
+  /// delete:
+  const deleteMovie = (movieId) => {
+    const serverURL = `${process.env.REACT_APP_serverURL}/deleteMovie/${movieId}`;
+    axios
+      .delete(serverURL)
+      .then((response) => {
+        setNewArr(response.data);
+      })
+      .catch((error) => {
+        console.error("Error deleting movie:", error);
+      });
+  };
+
+  ///////
+
+  return (
+    <>
+      {newArr.map((item) => {
+        return (
+          <Card style={{ width: "18rem" }} key={item.id}>
+            <Card.Body>
+              <Card.Title>{item.favmoviename}</Card.Title>
+              <Card.Text>{item.comment}</Card.Text>
+              <Card.Text>{item.releaseDate}</Card.Text>
+              <Card.Text>{item.favmovieposterpath}</Card.Text>
+              <Button variant="success" onClick={() => {showUpdateModal(item);}}>
+                Update
+              </Button>
+              <Button variant="danger" onClick={() => deleteMovie(item.id)}>
+                Delete
+              </Button>
+            </Card.Body>
+          </Card>
+        );
+      })}
+
+      <Modal show={showUpdateModalFlag} onHide={handleCloseUpdateModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update Comment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={updateComment}>
+            <label>
+              Comment:
+              <input
+                type="text"
+                name="comment"
+                defaultValue={clickedMovie.comment}
+              />
+            </label>
+            <Button variant="primary" type="submit">
+              Update
+            </Button>
+          </form>
+        </Modal.Body>
+      </Modal>
+    </>
+  );
 }
 
 export default Movie;
