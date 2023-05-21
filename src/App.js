@@ -11,7 +11,7 @@ function App() {
       <NavBar />
       <Routes>
       <Route path='/' element = {<Home />}></Route>
-      <Route path='/favllist' element = {<FavList />}></Route>
+      <Route path='/favlist' element = {<FavList />}></Route>
       </Routes>
     </div>
   );
