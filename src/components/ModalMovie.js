@@ -13,6 +13,7 @@ function ModalMovie({ movie, addToFav }){
 
   const handleAddToFav = () => {
     addToFav({ ...movie, comment });
+    handleClose();
   };
 
   return (
